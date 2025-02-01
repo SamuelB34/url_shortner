@@ -36,8 +36,7 @@ samuelb34-url_shortner/
     └── routes/
         ├── index.ts
         └── url.routes.ts
-
-
+```
 
 ## Getting Started
 
@@ -76,4 +75,3 @@ You can start the application in development mode using:
 
 ```bash
 npm run dev
-
