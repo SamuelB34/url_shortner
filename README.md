@@ -34,10 +34,12 @@ samuelb34-url_shortner/
     │   ├── base.controller.ts
     │   └── url/
     │       └── url.controller.ts
+    ├── database/
+    │   └── db.ts
     ├── middlewares/
     │   └── validations.ts
     ├── models/
-    │   └── url.model.ts         # New MongoDB model for URLs
+    │   └── shortened_url.model.ts         # New MongoDB model for URLs
     └── routes/
         ├── index.ts
         └── url.routes.ts
@@ -123,13 +125,13 @@ Here is the `Url` model:
 import mongoose, { Schema, model } from "mongoose";
 
 export interface UrlType {
-  short: string;
-  url: string;
+    short: string;
+    url: string;
 }
 
 const urlSchema = new Schema<UrlType>({
-  short: { type: String, required: true },
-  url: { type: String, required: true },
+    short: { type: String, required: true },
+    url: { type: String, required: true },
 });
 
 const Url = model<UrlType>("Url", urlSchema);

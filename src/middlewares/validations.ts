@@ -20,7 +20,7 @@
  * @see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/a#valid_links
  */
 export const validateUrl = (url: string): boolean => {
-    const regex = /^(https?:\/\/)?([\da-z.-]+)\.([a-z.]{2,6})(\/[\w .-]*)*\/?$/i;
+    const regex = /^(https?:\/\/)?([\w.-]+)\.([a-z.]{2,6})(\/[\w\-.~:?#\[\]@!$&'()*+,;=%]*)*\/?$/i;
     return regex.test(url);
 };
 

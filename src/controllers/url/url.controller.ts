@@ -2,7 +2,7 @@ import { BaseController } from "../base.controller"
 import { NextFunction, Request, Response } from "express"
 import { nanoid } from "nanoid";
 import {addHttpsProtocol, validateUrl} from "../../middlewares/validations";
-import ShortenedUrlModel from "../../models/ShortenedUrl";
+import ShortenedUrlModel from "../../models/shortened_url.model";
 
 // In-memory store to hold the URLs
 const memoryStore = new Map();
