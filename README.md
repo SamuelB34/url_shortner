@@ -75,3 +75,69 @@ You can start the application in development mode using:
 
 ```bash
 npm run dev
+
+```
+
+## API Endpoints
+
+### 1. Create a Shortened URL
+- **URL**: `/`
+- **Method**: `POST`
+- **Body**:
+    ```json
+    {
+      "url": "https://www.example.com"
+    }
+    ```
+- **Response**:
+    ```json
+    {
+      "msg": "Success",
+      "data": {
+        "short_id": "localhost:3000/shortId"
+      }
+    }
+    ```
+
+### 2. Redirect to Original URL
+- **URL**: `/:id`
+- **Method**: `GET`
+- **Response**: Redirects to the original URL.
+
+## Folder Structure
+
+- **controllers/**: Contains the logic for handling API requests.
+  - `base.controller.ts`: Base controller with helper methods for sending responses.
+  - `url.controller.ts`: Controller for handling URL shortening and redirection.
+
+- **middlewares/**: Contains middleware functions like URL validation and protocol addition.
+  - `validations.ts`: Functions for validating and modifying URLs.
+
+- **routes/**: Defines the routes for the application.
+  - `url.routes.ts`: Routes related to URL shortening and redirection.
+
+## TypeScript Configuration
+
+The TypeScript configuration is set up to support decorators and ES module interoperability. Make sure to use `ts-node-dev` for running TypeScript files directly.
+
+```json
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "target": "es5",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": false,
+    "sourceMap": true,
+    "typeRoots": [
+      "src/custom_typings"
+    ]
+  },
+  "include": ["src/**/*.ts"],
+  "files": ["src/custom_typings/express.d.ts"]
+}
+
