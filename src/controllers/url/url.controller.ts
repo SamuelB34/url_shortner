@@ -2,6 +2,7 @@ import { BaseController } from "../base.controller"
 import { NextFunction, Request, Response } from "express"
 import { nanoid } from "nanoid";
 import {addHttpsProtocol, validateUrl} from "../../middlewares/validations";
+import ShortenedUrlModel from "../../models/ShortenedUrl";
 
 // In-memory store to hold the URLs
 const memoryStore = new Map();
@@ -20,26 +21,25 @@ class UrlController extends BaseController {
      * @returns {Response} - Redirects to the original URL or responds with an error message if not found.
      */
     public getUrl = async (req: Request, res: Response, next: NextFunction) => {
-        const { id } = req.params;
+        const { id } = req.params; // Get the short ID from the URL parameters
 
-        // Check if the 'links' exist in memory; if not, initialize it.
-        if (!memoryStore.has('links')) {
-            memoryStore.set('links', []);
+        try {
+            // Search for the URL in the database using the 'nanoid'
+            const urlRecord = await ShortenedUrlModel.findOne({ nanoid: id });
+
+            if (urlRecord) {
+                // Redirect to the original URL if found
+                return res.redirect(addHttpsProtocol(urlRecord.url));
+            } else {
+                // If the URL is not found, respond with an error message
+                return this.respondInvalid(res, 'Url does not exist');
+            }
+        } catch (error) {
+            console.error('Error fetching the URL:', error);
+            // Return a 500 status for internal server error in case of failure
+            return res.status(500).send('Internal Server Error');
         }
-
-        // Get the list of URLs stored in memory
-        const urls = memoryStore.get('links');
-
-        // Find the URL object with the matching short ID
-        const value = urls.find((url: any) => url.short === id);
-
-        // Redirect to the original URL if found, otherwise respond with an error
-        if (value) {
-            return res.redirect(addHttpsProtocol(value.url))
-        } else {
-            return this.respondInvalid(res, 'Url does not exist');
-        }
-    }
+    };
 
     /**
      * Creates a new shortened URL.
@@ -52,32 +52,34 @@ class UrlController extends BaseController {
     public create = async (req: Request, res: Response, next: NextFunction) => {
         const body = req.body;
 
-        if(!validateUrl(body.url)) {
+        // Validate the URL format using a helper function
+        if (!validateUrl(body.url)) {
             return this.respondInvalid(res, 'Invalid url');
         }
 
         // Generate a short ID using nanoid (6 characters long)
         const shortId = nanoid(6);
 
-        // Check if the 'links' exist in memory; if not, initialize it.
-        if (!memoryStore.has('links')) {
-            memoryStore.set('links', []);
+        try {
+            // Create a new shortened URL object
+            const newUrl = new ShortenedUrlModel({
+                url: body.url,
+                nanoid: shortId
+            });
+
+            // Save the new shortened URL in the database
+            await newUrl.save();
+
+            // Respond with the success message and the shortened URL details
+            return this.respondSuccess(res, 'Success', {
+                short_id: `${process.env.SERVER_HOST}:${process.env.PORT}/${shortId}`
+            });
+        } catch (error) {
+            console.error('Error saving the shortened URL:', error);
+            // Return a 500 status for internal server error in case of failure
+            return res.status(500).send('Internal Server Error');
         }
-
-        // Get the list of URLs stored in memory
-        const urls = memoryStore.get('links');
-
-        // Add the new shortened URL to the list
-        urls.push({
-            short: shortId,
-            url: body.url,
-        });
-
-        // Respond with the success message and the shortened URL details
-        return this.respondSuccess(res, `Success`, {
-            short_id: `${process.env.SERVER_HOST}:${process.env.PORT}/${ shortId }`
-        });
-    }
+    };
 }
 
 // Export the UrlController instance
